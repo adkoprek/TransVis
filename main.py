@@ -6,6 +6,7 @@ from svg import Document
 grid: list[PNTS] = []
 doc = Document()
 doc.init_document(800, 800)
+doc.set_background("black")
 
 def create_line(begin_x, end_x, begin_y, end_y, steps) -> PNTS:
 	dx = (end_x - begin_x) / steps
