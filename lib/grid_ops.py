@@ -1,17 +1,15 @@
 from typing import Callable
 import numpy as np
-import lib.line_opps as lop
+import lib.line_ops as lop
 import lib.svg as svg
 
 
 class Grid:
-    hor = []
-    ver = []
-    trans_hor = []
-    trans_ver = []
-
     def __init__(self) -> None:
-        pass
+        self.hor = []
+        self.ver = []
+        self.trans_hor = []
+        self.trans_ver = []
     
     @staticmethod
     def create_line(begin_x, end_x, begin_y, end_y, steps) -> lop.PNTS:
@@ -54,10 +52,10 @@ class Grid:
                 line /= m
                 line *= r
 
-    def paint(self, doc: svg.Document, color: str = "#58C4DD") -> None:
+    def paint(self, doc: svg.Document, **kwargs) -> None:
         for lines in (zip(self.hor, self.trans_hor), zip(self.ver, self.trans_ver)):
             for line, trans in lines:
                 start = lop.construct_bezier_string(lop.line_to_bezier(line))
                 end = lop.construct_bezier_string(lop.line_to_bezier(trans))
-                doc.create_animated_path(start, end, dur=5, color=color)
+                doc.create_animated_path(start, end, **kwargs)
 

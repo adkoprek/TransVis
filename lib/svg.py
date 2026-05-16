@@ -32,7 +32,7 @@ class Document:
     
     # Creates an animation between two paths
     def create_animated_path(
-        self, init: str, end: str, color: str = "black", width: int = 1, dur: float = 2) -> None:
+        self, init: str, end: str, color: str = "#58C4DD", width: int = 1, dur: float = 2) -> None:
         path = self.root.createElement("path")
         path.setAttribute("stroke", color)
         path.setAttribute("stroke-width", str(width))

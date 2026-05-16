@@ -1,5 +1,5 @@
 import numpy as np
-from lib.grid_opps import Grid
+from lib.grid_ops import Grid
 from lib.svg import Document
 
 
@@ -16,6 +16,6 @@ grid.transform(
     lambda x, y: 25 * np.cos(x / 80)
 )
 grid.normalize(int(0.98 * R))
-grid.paint(doc)
+grid.paint(doc, dur=10)
 doc.save("svg.html")
 
