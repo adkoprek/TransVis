@@ -56,7 +56,7 @@ normalize(r, trans_grid)
 for line, trans in zip(grid, trans_grid):
 	start = construct_bezier_string(line_to_bezier(line))
 	end = construct_bezier_string(line_to_bezier(trans))
-	doc.create_animated_path(start, end, dur=5)
+	doc.create_animated_path(start, end, dur=5, color="#58C4DD")
 
 doc.save("svg.html")
 
