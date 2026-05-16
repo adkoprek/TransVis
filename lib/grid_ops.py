@@ -10,6 +10,10 @@ class Grid:
         self.ver = []
         self.trans_hor = []
         self.trans_ver = []
+        self.dir_i = None
+        self.dir_j = None
+        self.trans_dir_i = None
+        self.trans_dir_j = None
     
     @staticmethod
     def create_line(begin_x, end_x, begin_y, end_y, steps) -> lop.PNTS:
@@ -32,12 +36,21 @@ class Grid:
         for i in range(y_min, y_max + dy, dy):
             self.ver.append(self.create_line(i, i, x_min, x_max, dy))
 
+    def create_direction_vectors(self, l1: int, l2: int) -> None:
+        self.dir_i = self.create_line(0, l1, 0, 0, 1) 
+        print(self.dir_i)
+        self.dir_j = self.create_line(0, 0, 0, l2, 1) 
+
     def transform(self, xt: Callable[[float, float], float], yt: Callable[[float, float], float]) -> None:
         for line in self.hor:
             self.trans_hor.append(lop.transform(line, xt, yt))
 
         for line in self.ver:
             self.trans_ver.append(lop.transform(line, xt, yt))
+
+        if (self.dir_i is not None) and (self.dir_j is not None):
+            self.trans_dir_i = lop.transform(self.dir_i, xt, yt)
+            self.trans_dir_j = lop.transform(self.dir_j, xt, yt)
 
     def normalize(self, r: int) -> None:
         m = 0
@@ -52,10 +65,22 @@ class Grid:
                 line /= m
                 line *= r
 
+        if (self.dir_i is not None) and (self.dir_j is not None):
+            for direction in (self.trans_dir_i, self.trans_dir_j):
+                direction /= m
+                direction *= r
+
     def paint(self, doc: svg.Document, **kwargs) -> None:
         for lines in (zip(self.hor, self.trans_hor), zip(self.ver, self.trans_ver)):
             for line, trans in lines:
                 start = lop.construct_bezier_string(lop.line_to_bezier(line))
                 end = lop.construct_bezier_string(lop.line_to_bezier(trans))
                 doc.create_animated_path(start, end, **kwargs)
+
+        if (self.dir_i is not None) and (self.dir_j is not None):
+            for directions in ((self.dir_i, self.trans_dir_i), (self.dir_j, self.trans_dir_j)):
+                direction, trans_direction = directions
+                start = lop.construct_bezier_string(lop.line_to_bezier(direction))
+                end = lop.construct_bezier_string(lop.line_to_bezier(trans_direction))
+                doc.create_animated_path(start, end, **kwargs, color="red")
 

@@ -5,12 +5,14 @@ from xml.dom import minidom
 class Document:
     root: minidom.Document
     svg: minidom.Element
+    grid: minidom.Element
 
     # Creates a document
     def __init__(self) -> None:
         self.root = minidom.Document()
     
-    # Initializes an empty xml document
+    # Initializes an empty xml document and grid which is flipped to
+    # be maathematically aligned correctly 
     def init_document(self, width: int, height: int) -> None:
         self.svg = self.root.createElement("svg")
         self.svg.setAttribute("xmlns", "http://www.w3.org/2000/svg")
@@ -20,6 +22,10 @@ class Document:
         self.svg.setAttribute("viewBox", f"{-width / 2} {-height / 2} {width} {height}")
         self.root.appendChild(self.svg)
 
+        self.grid = self.root.createElement("g")
+        self.grid.setAttribute("transform", "scale(1,-1)")
+        self.svg.appendChild(self.grid)
+
     # Creates a background
     def set_background(self, color: str) -> None:
         background = self.root.createElement("rect")
@@ -28,7 +34,7 @@ class Document:
         background.setAttribute("width", "100%")
         background.setAttribute("height", "100%")
         background.setAttribute("fill", color)
-        self.svg.appendChild(background)
+        self.svg.insertBefore(background, self.grid)
     
     # Creates an animation between two paths
     def create_animated_path(
@@ -46,7 +52,7 @@ class Document:
         animate.setAttribute("fill", "freeze")
 
         path.appendChild(animate)
-        self.svg.appendChild(path)
+        self.grid.appendChild(path)
 
     # Returns the svg content as a string
     def get_str(self) -> str:
