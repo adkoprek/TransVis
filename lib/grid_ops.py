@@ -2,6 +2,7 @@ from typing import Callable
 import numpy as np
 import lib.line_ops as lop
 import lib.svg as svg
+import lib.vec_ops as vop
 
 
 class Grid:
@@ -12,8 +13,8 @@ class Grid:
         self.trans_ver = []
         self.dir_i = None
         self.dir_j = None
-        self.trans_dir_i = None
-        self.trans_dir_j = None
+        self.trans_dir_i = np.array([])
+        self.trans_dir_j = np.array([])
     
     @staticmethod
     def create_line(begin_x, end_x, begin_y, end_y, steps) -> lop.PNTS:
@@ -38,7 +39,6 @@ class Grid:
 
     def create_direction_vectors(self, l1: int, l2: int) -> None:
         self.dir_i = self.create_line(0, l1, 0, 0, 1) 
-        print(self.dir_i)
         self.dir_j = self.create_line(0, 0, 0, l2, 1) 
 
     def transform(self, xt: Callable[[float, float], float], yt: Callable[[float, float], float]) -> None:
@@ -70,6 +70,33 @@ class Grid:
                 direction /= m
                 direction *= r
 
+    def paint_directions(
+        self, doc: svg.Document, c1: str = "#6A9C52", c2: str = "#CE5044", l: int = 10, **kwargs):
+        if (self.dir_i is not None) and (self.dir_j is not None):
+            for directions in ((self.dir_i, self.trans_dir_i, c1), (self.dir_j, self.trans_dir_j, c2)):
+                direction, trans_direction, color = directions
+                
+                direction_bez = lop.line_to_bezier(direction)
+                trans_direction_bez = lop.line_to_bezier(trans_direction)
+
+                start_triangle = vop.tip_vertecies_from_beizer(direction_bez, l)
+                end_triangle = vop.tip_vertecies_from_beizer(trans_direction_bez, l)
+
+                start_triangle_bez = vop.vertecies_to_string(start_triangle)
+                end_triangle_bez = vop.vertecies_to_string(end_triangle)
+
+                start_line_bez = lop.construct_bezier_string(direction_bez)
+                end_line_bez = lop.construct_bezier_string(trans_direction_bez)
+
+                doc.create_animated_vector(
+                        start_line_bez, 
+                        end_line_bez, 
+                        start_triangle_bez, 
+                        end_triangle_bez,
+                        color=color,
+                        **kwargs
+                    )
+
     def paint(self, doc: svg.Document, **kwargs) -> None:
         for lines in (zip(self.hor, self.trans_hor), zip(self.ver, self.trans_ver)):
             for line, trans in lines:
@@ -77,10 +104,4 @@ class Grid:
                 end = lop.construct_bezier_string(lop.line_to_bezier(trans))
                 doc.create_animated_path(start, end, **kwargs)
 
-        if (self.dir_i is not None) and (self.dir_j is not None):
-            for directions in ((self.dir_i, self.trans_dir_i), (self.dir_j, self.trans_dir_j)):
-                direction, trans_direction = directions
-                start = lop.construct_bezier_string(lop.line_to_bezier(direction))
-                end = lop.construct_bezier_string(lop.line_to_bezier(trans_direction))
-                doc.create_animated_path(start, end, **kwargs, color="red")
 

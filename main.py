@@ -14,12 +14,13 @@ s = 100
 
 grid: Grid = Grid()
 grid.init_grid(-R, R, -R, R, 20)
-grid.create_direction_vectors(40, 40)
+grid.create_direction_vectors(80, 80)
 grid.transform(
     lambda x, y: x * np.cos(d(x, y) / s) - y * np.sin(d(x,y) / s),
     lambda x, y: x * np.cos(d(x, y) / s) + y * np.sin(d(x,y) / s),
 )
 grid.normalize(int(1 * R))
 grid.paint(doc, dur=10)
+grid.paint_directions(doc, dur=10, width=2)
 doc.save("svg.html")
 

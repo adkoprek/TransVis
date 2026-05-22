@@ -35,10 +35,36 @@ class Document:
         background.setAttribute("height", "100%")
         background.setAttribute("fill", color)
         self.svg.insertBefore(background, self.grid)
-    
-    # Creates an animation between two paths
-    def create_animated_path(
-        self, init: str, end: str, color: str = "#58C4DD", width: int = 1, dur: float = 2) -> None:
+
+    def construct_animated_tip(
+        self, triangle_init: str, triangle_end: str, color: str, dur: float = 2) -> minidom.Element:
+        path = self.root.createElement("polygon")
+        path.setAttribute("stroke", "none")
+        path.setAttribute("fill", color)
+
+        animate = self.root.createElement("animate")
+        animate.setAttribute("from", triangle_init)
+        animate.setAttribute("to", triangle_end)
+        animate.setAttribute("dur", f"{dur}s")
+        animate.setAttribute("attributeName", "points")
+        animate.setAttribute("fill", "freeze")
+
+        path.appendChild(animate)
+
+        return path
+
+    def create_animated_vector(
+        self, line_init: str, line_end: str, triangle_init: str, triangle_end: str,
+        color: str, width: int = 1, dur: float = 2) -> None:
+        vec = self.root.createElement("g")
+        lin = self.construct_animated_path(line_init, line_end, color=color, width=width, dur=dur)
+        tip = self.construct_animated_tip(triangle_init, triangle_end, color, dur=dur)
+        vec.appendChild(lin)
+        vec.appendChild(tip)
+        self.grid.appendChild(vec)
+
+    def construct_animated_path(
+        self, init: str, end: str, color: str = "#58C4DD", width: int = 1, dur: float = 2) -> minidom.Element:
         path = self.root.createElement("path")
         path.setAttribute("stroke", color)
         path.setAttribute("stroke-width", str(width))
@@ -52,6 +78,13 @@ class Document:
         animate.setAttribute("fill", "freeze")
 
         path.appendChild(animate)
+
+        return path
+
+    # Creates an animation between two paths
+    def create_animated_path(
+        self, init: str, end: str, color: str = "#58C4DD", width: int = 1, dur: float = 2) -> None:
+        path = self.construct_animated_path(init, end, color=color, width=width, dur=dur)
         self.grid.appendChild(path)
 
     # Returns the svg content as a string
