@@ -6,8 +6,12 @@ from lib.svg import Document
 R = 400
 
 doc = Document()
-doc.init_document(2 * R, 2 * R)
+doc.init_document(2 * R, 2 * R, text_frame=int((0.7) * R))
 doc.set_background("black")
+doc.add_functions(
+        r"$f_x(x,y)=x \cdot \cos\left(\frac{\sqrt{x^2 + y^2}}{100} \right) - y \cdot \sin\left(\frac{\sqrt{x^2+y^2}}{100}\right)$", 
+        r"$f_y(x,y)=x \cdot \cos\left(\frac{\sqrt{x^2 + y^2}}{100} \right) + y \cdot \sin\left(\frac{\sqrt{x^2+y^2}}{100}\right)$", 
+        10, size=20)
 
 d = lambda x, y: np.sqrt(x ** 2 + y ** 2)
 s = 100

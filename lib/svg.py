@@ -1,4 +1,6 @@
-from xml.dom import minidom
+import io
+from xml.dom import minidom, Node
+import matplotlib.pyplot as plt
 
 
 # This class handles svg a.k.a xml data using minidom
@@ -6,6 +8,7 @@ class Document:
     root: minidom.Document
     svg: minidom.Element
     grid: minidom.Element
+    text_offset: int
 
     # Creates a document
     def __init__(self) -> None:
@@ -13,18 +16,71 @@ class Document:
     
     # Initializes an empty xml document and grid which is flipped to
     # be maathematically aligned correctly 
-    def init_document(self, width: int, height: int) -> None:
+    def init_document(self, width: int, height: int, text_frame: int = 0) -> None:
         self.svg = self.root.createElement("svg")
         self.svg.setAttribute("xmlns", "http://www.w3.org/2000/svg")
         self.svg.setAttribute("version", "1.1")
         self.svg.setAttribute("width", f"{width}px")
-        self.svg.setAttribute("height", f"{height}px")
-        self.svg.setAttribute("viewBox", f"{-width / 2} {-height / 2} {width} {height}")
+        self.svg.setAttribute("height", f"{height + text_frame}px")
+        self.svg.setAttribute("viewBox", f"{-width / 2} {-height / 2} {width} {height + text_frame}")
         self.root.appendChild(self.svg)
 
         self.grid = self.root.createElement("g")
         self.grid.setAttribute("transform", "scale(1,-1)")
         self.svg.appendChild(self.grid)
+
+        self.text_offset = int(height / 2)
+
+
+    @staticmethod
+    def latex_to_svg(latex, size: int = 24, color: str = "white") -> minidom.Element:
+        fig = plt.figure()
+        text = fig.text(0, 0, latex, color=color, fontsize=size)
+
+        # Resize `````````````````````````````````````````````````````````````````````````
+        fig.canvas.draw()
+        bbox = text.get_window_extent()
+        dpi = fig.dpi
+        width = bbox.width / dpi
+        height = bbox.height / dpi
+        fig.set_size_inches(width, height)
+
+        plt.axis("off")
+
+        buffer = io.StringIO()
+
+        fig.savefig(
+            buffer,
+            format="svg",
+            bbox_inches="tight",
+            pad_inches=0.1,
+            transparent=True
+        )
+
+        svg_text = buffer.getvalue()
+        svg_root = minidom.parseString(svg_text)
+
+        svg = minidom.Document()
+        group = svg.createElement("g")
+        
+        for node in svg_root.documentElement.childNodes:
+            if node.nodeType == Node.ELEMENT_NODE:
+                if node.tagName in ["g", "defs"]:
+                    group.appendChild(node)
+
+        svg.appendChild(group)
+
+        return group
+
+
+    def add_functions(self, latex_x: str, latex_y: str, padding: int, color: str = "white", size: int = 24):
+        x_label = self.latex_to_svg(latex_x, color=color, size=size)
+        x_label.setAttribute("transform", f"translate(-215, {self.text_offset + padding})")
+        y_label = self.latex_to_svg(latex_y, color=color, size=size)
+        y_label.setAttribute("transform", f"translate(-215, {self.text_offset + padding + 57})")
+
+        self.svg.appendChild(x_label)
+        self.svg.appendChild(y_label)
 
     # Creates a background
     def set_background(self, color: str) -> None:

@@ -63,7 +63,7 @@ class Grid:
         for lines in (self.trans_hor, self.trans_ver):
             for line in lines:
                 line /= m
-                line *= r
+                line *= r * 0.95
 
         if (self.dir_i is not None) and (self.dir_j is not None):
             for direction in (self.trans_dir_i, self.trans_dir_j):
