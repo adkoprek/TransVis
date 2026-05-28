@@ -1,18 +1,27 @@
-from typing import Callable, TypeAlias
+#  _______               __      ___     
+# |__   __|              \ \    / (_)    
+#    | |_ __ __ _ _ __  __\ \  / / _ ___ 
+#    | | '__/ _` | '_ \/ __\ \/ / | / __|
+#    | | | | (_| | | | \__ \\  /  | \__ \
+#    |_|_|  \__,_|_| |_|___/ \/   |_|___/
+#   https://git.psi.ch/hipa_apps/TransVis
+#
+# Implements line operations which transform
+# lines and interpolates them using catmull-ron
+# algorithm. Allows export of lines into svg
+# readable paths.
+#
+# @Author: Adam Koprek
+
 import numpy as np
-import numpy.typing as npt
+from typing import Callable
+from lib.types import PNT, PNTS, BEZ, BEZS
 
 
-PNT:  TypeAlias = npt.NDArray[np.float64]    # (2,)
-PNTS: TypeAlias = npt.NDArray[np.float64]    # (M,2)
-BEZ:  TypeAlias = npt.NDArray[np.float64]    # (4,2)
-BEZS: TypeAlias = npt.NDArray[np.float64]    # (M,4,2)
-MAT:  TypeAlias = npt.NDArray[np.float64]    # (4,4)
-
-CONVERTER_MATRIX: MAT = (1 / 6) * np.array([[ 0, 6, 0,  0],
-                                            [-1, 6, 1,  0],
-                                            [ 0, 1, 6, -1],
-                                            [ 0, 0, 6,  0]], dtype=np.float64)
+CONVERTER_MATRIX = (1 / 6) * np.array([[ 0, 6, 0,  0],
+                                       [-1, 6, 1,  0],
+                                       [ 0, 1, 6, -1],
+                                       [ 0, 0, 6,  0]], dtype=np.float64)
 
 
 # This function takes a set of four points (P_{k-1}, P_k, P_{k+1}, P_{k+2}) and
@@ -70,12 +79,7 @@ def construct_bezier_string(bezier: BEZS) -> str:
 
 
 # Applies a coordinate-wise transformation to a set of 2D points
-def transform(
-    points: PNTS,
-    xt: Callable[[float, float], float],
-    yt: Callable[[float, float], float]
-) -> PNTS:
-
+def transform(points: PNTS, xt: Callable[[float, float], float], yt: Callable[[float, float], float]) -> PNTS:
     trans_points = []
 
     for point in points:
@@ -83,19 +87,4 @@ def transform(
         trans_points.append(np.array([xt(x, y), yt(x, y)], dtype=np.float64))
 
     return np.array(trans_points, dtype=np.float64)
-
-
-# Example transformation
-if __name__ == "__main__":
-    line: PNT = np.array([[0, i] for i in range(-10, 111, 10)], dtype=np.float64)
-
-    print(construct_bezier_string(line_to_bezier(line)))
-
-    trans_line = transform(
-        line,
-        lambda x, y: x + y,
-        lambda _, y: 10 * abs(y) ** 0.5
-    )
-
-    print(construct_bezier_string(line_to_bezier(trans_line)))
 

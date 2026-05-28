@@ -1,3 +1,17 @@
+#  _______               __      ___     
+# |__   __|              \ \    / (_)    
+#    | |_ __ __ _ _ __  __\ \  / / _ ___ 
+#    | | '__/ _` | '_ \/ __\ \/ / | / __|
+#    | | | | (_| | | | \__ \\  /  | \__ \
+#    |_|_|  \__,_|_| |_|___/ \/   |_|___/
+#   https://git.psi.ch/hipa_apps/TransVis
+#
+# Provides an interface to operate on svg
+# documents. It is designed to support the
+# operations for animated paths and vectors.
+#
+# @Author: Adam Koprek
+
 import io
 from xml.dom import minidom, Node
 import matplotlib.pyplot as plt
@@ -31,7 +45,7 @@ class Document:
 
         self.text_offset = int(height / 2)
 
-
+    # Creates a minidom.Element svg of the provided latex inline math equation
     @staticmethod
     def latex_to_svg(latex, size: int = 24, color: str = "white") -> minidom.Element:
         fig = plt.figure()
@@ -73,6 +87,9 @@ class Document:
         return group
 
 
+    # Add function descriptions to the bottom of the animation using
+    # the provide latex code and the provided padding to the bottom
+    # of the animation
     def add_functions(self, latex_x: str, latex_y: str, padding: int, color: str = "white", size: int = 24):
         x_label = self.latex_to_svg(latex_x, color=color, size=size)
         x_label.setAttribute("transform", f"translate(-215, {self.text_offset + padding})")
@@ -82,7 +99,7 @@ class Document:
         self.svg.appendChild(x_label)
         self.svg.appendChild(y_label)
 
-    # Creates a background
+    # Creates a background for the entire canvas
     def set_background(self, color: str) -> None:
         background = self.root.createElement("rect")
         background.setAttribute("x", "-50%")
@@ -92,6 +109,7 @@ class Document:
         background.setAttribute("fill", color)
         self.svg.insertBefore(background, self.grid)
 
+    # Creates an animated vector tip from the triangle vertecies string
     def construct_animated_tip(
         self, triangle_init: str, triangle_end: str, color: str, dur: float = 2) -> minidom.Element:
         path = self.root.createElement("polygon")
@@ -109,6 +127,7 @@ class Document:
 
         return path
 
+    # Creates an animated vector from the path string and the vector tips vectecies string
     def create_animated_vector(
         self, line_init: str, line_end: str, triangle_init: str, triangle_end: str,
         color: str, width: int = 1, dur: float = 2) -> None:
@@ -119,6 +138,7 @@ class Document:
         vec.appendChild(tip)
         self.grid.appendChild(vec)
 
+    # Constructs and returns an animated path from the provided svg d-path start to the end
     def construct_animated_path(
         self, init: str, end: str, color: str = "#58C4DD", width: int = 1, dur: float = 2) -> minidom.Element:
         path = self.root.createElement("path")
@@ -137,7 +157,7 @@ class Document:
 
         return path
 
-    # Creates an animation between two paths
+    # Creates an animated path from the provided svg d-path start to the end
     def create_animated_path(
         self, init: str, end: str, color: str = "#58C4DD", width: int = 1, dur: float = 2) -> None:
         path = self.construct_animated_path(init, end, color=color, width=width, dur=dur)
@@ -151,5 +171,4 @@ class Document:
     def save(self, path: str) -> None:
         with open(path, "w+") as file:
             file.write(self.get_str())
-
         
