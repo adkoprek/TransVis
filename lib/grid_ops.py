@@ -7,20 +7,21 @@
 #   https://git.psi.ch/hipa_apps/TransVis
 #
 # Implements a 2D grid that has the capapilites
-# to store vertical and horizontal grid lines as
-# well as the functionality for direction vectors.
+# to store transformable grid lines as well as
+# direction vectors.
 #
 # @Author: Adam Koprek
 
 from typing import Callable
-from lib.line_ops import Line
-from lib.vec_ops import TransVector
+
 import lib.svg as svg
+from lib.line_ops import TransLine
+from lib.vec_ops import TransVector
 
 
 class Grid:
     def __init__(self) -> None:
-        self.line: list[Line] = []
+        self.line: list[TransLine] = []
 
         self.set_dir = False
         self.dir_i: TransVector
@@ -31,11 +32,11 @@ class Grid:
     def init_grid(self, x_min, x_max, y_min, y_max, num) -> None:
         dx = int((x_max - x_min) / num)
         for i in range(x_min, x_max + dx, dx):
-            self.line.append(Line(x_min, x_max, i, i, dx))
+            self.line.append(TransLine(x_min, x_max, i, i, dx))
 
         dy = int((y_max - y_min) / num)
         for i in range(y_min, y_max + dy, dy):
-            self.line.append(Line(i, i, x_min, x_max, dy))
+            self.line.append(TransLine(i, i, x_min, x_max, dy))
 
     # Creates direction vectors in the direction of the unit
     # vectors with the specified lenghts

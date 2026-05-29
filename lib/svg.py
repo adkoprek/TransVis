@@ -13,15 +13,14 @@
 # @Author: Adam Koprek
 
 import io
-from xml.dom import minidom, Node
+import numpy as np
 import matplotlib.pyplot as plt
 from dataclasses import dataclass
+from xml.dom import minidom, Node
 
-from matplotlib.transforms import TransformNode
-from lib.line_ops import Line
-from lib.vec_ops import TransTip, TransVector
 from lib.types import PNTS, BEZS
-import numpy as np
+from lib.line_ops import TransLine
+from lib.vec_ops import TransTip, TransVector
 
 
 @dataclass
@@ -162,7 +161,7 @@ class Document:
         return out
 
     # Constructs and returns an animated path from the provided svg d-path start to the end
-    def _construct_animated_path(self, line: Line, args: AnimatedObjectParams) -> minidom.Element:
+    def _construct_animated_path(self, line: TransLine, args: AnimatedObjectParams) -> minidom.Element:
         path = self.root.createElement("path")
         path.setAttribute("stroke", args.color)
         path.setAttribute("stroke-width", str(args.width))
@@ -216,7 +215,7 @@ class Document:
         self.grid.appendChild(vec)
 
     # Creates an animated path from the provided svg d-path start to the end
-    def create_animated_line(self, line: Line, args: AnimatedObjectParams) -> None:
+    def create_animated_line(self, line: TransLine, args: AnimatedObjectParams) -> None:
         path = self._construct_animated_path(line, args)
         self.grid.appendChild(path)
 

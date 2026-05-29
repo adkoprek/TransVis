@@ -6,33 +6,32 @@
 #    |_|_|  \__,_|_| |_|___/ \/   |_|___/
 #   https://git.psi.ch/hipa_apps/TransVis
 #
-# Implements additional functionalities to
-# automatically calculate vector tips and
-# implement them in an svg polygon.
+# Implements a transformable vector which 
+# automatically calculates its vector tip.
 #
 # @Author: Adam Koprek
 
-from lib.line_ops import BEZS, PNTS
 import numpy as np
 from copy import copy
-from lib.line_ops import Line
 from typing import Callable
 
+from lib.line_ops import TransLine
+from lib.line_ops import BEZS, PNTS
 
-# This class represents a vector tip which transforms
+
 class TransTip:
     side: int
 
     # Creates the tip and calculates the initial tip with the given side lenght
     # perpendicular to the end of the provided line
-    def __init__(self, line: Line, side: int) -> None:
+    def __init__(self, line: TransLine, side: int) -> None:
         self.side = side
         self.vertecies = self._tip_vertecies_from_beizer(line.get_bezier(), self.side)
         self.trans_vertecies = np.array([])
 
     # Calculates the transformed vectercies using the side lenght passed in the
     # constuctor perpendicular to the end of the provided transfomed line
-    def transform(self, line: Line) -> None:
+    def transform(self, line: TransLine) -> None:
         self.trans_vertecies = self._tip_vertecies_from_beizer(line.get_transform_bez(), self.side)
 
     # Returns the initial tip
@@ -68,14 +67,13 @@ class TransTip:
         return np.array([v1, v2, v3])
 
 
-# This class represents a vector which transforms itself
 class TransVector:
-    line: Line
+    line: TransLine
     tip: TransTip
 
     # Creates the vector which is build from a line and a tip
     def __init__(self, begin_x: float, end_x: float, begin_y: float, end_y: float, w: int) -> None:
-        self.line = Line(begin_x, end_x, begin_y, end_y, 1)
+        self.line = TransLine(begin_x, end_x, begin_y, end_y, 1)
         self.tip = TransTip(self.line, w)
 
     # Transforms the vector using the given functions
@@ -89,6 +87,6 @@ class TransVector:
         self.tip.transform(self.line)
 
     # Returns the line and the tip as individual components
-    def get_components(self) -> tuple[Line, TransTip]:
+    def get_components(self) -> tuple[TransLine, TransTip]:
         return (self.line, self.tip)
 

@@ -6,10 +6,9 @@
 #    |_|_|  \__,_|_| |_|___/ \/   |_|___/
 #   https://git.psi.ch/hipa_apps/TransVis
 #
-# Implements line operations which transform
-# lines and interpolates them using catmull-ron
-# algorithm. Allows export of lines into svg
-# readable paths.
+# Implements a transoformable line which
+# using catmull-ron interpolation can be
+# converted into a chain of bezier curves.
 #
 # @Author: Adam Koprek
 
@@ -18,12 +17,13 @@ from typing import Callable
 from lib.types import PNT, PNTS, BEZ, BEZS
 
 
+# Convertion Matrix used for Catmull-Ron
 CONVERTER_MATRIX = (1 / 6) * np.array([[ 0, 6, 0,  0],
                                        [-1, 6, 1,  0],
                                        [ 0, 1, 6, -1],
                                        [ 0, 0, 6,  0]], dtype=np.float64)
 
-class Line:
+class TransLine:
     # Creates a line with a specified amount of points 
     # from the specified cordinates. Additionally it
     # creates an extra point at both ends for later

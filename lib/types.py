@@ -11,9 +11,9 @@
 #
 # @Author: Adam Koprek
 
-from typing import TypeAlias
-import numpy.typing as npt
 import numpy as np
+import numpy.typing as npt
+from typing import TypeAlias
 
 
 # A 2D point
