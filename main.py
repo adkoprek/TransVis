@@ -1,6 +1,6 @@
 import numpy as np
 from lib.grid_ops import Grid
-from lib.svg import Document
+from lib.svg import AnimatedObjectParams, Document
 
 
 R = 400
@@ -18,13 +18,13 @@ s = 100
 
 grid: Grid = Grid()
 grid.init_grid(-R, R, -R, R, 20)
-grid.create_direction_vectors(60, 60)
+grid.create_direction_vectors(40, 40, 15)
 grid.transform(
     lambda x, y: x * np.cos(d(x, y) / s) - y * np.sin(d(x,y) / s),
     lambda x, y: x * np.cos(d(x, y) / s) + y * np.sin(d(x,y) / s),
 )
-grid.normalize(int(1 * R))
-grid.paint(doc, dur=10)
-grid.paint_directions(doc, dur=10, width=4, l=10)
+grid.normalize(int(0.95 * R))
+grid.paint(doc)
+grid.paint_directions(doc, AnimatedObjectParams(color="#CF5044",width=3), AnimatedObjectParams(color="#699C52", width=3))
 doc.save("svg.html")
 

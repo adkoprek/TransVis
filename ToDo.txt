@@ -1,7 +1,5 @@
 1. Functions rendering +
 2. README
 3. Clean up
-  - Create objects for parameters
   - Fix scaled direction vectors not following the curve
-4. Docs
 5. Check against requirements

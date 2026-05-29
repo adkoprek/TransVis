@@ -15,7 +15,20 @@
 import io
 from xml.dom import minidom, Node
 import matplotlib.pyplot as plt
+from dataclasses import dataclass
 
+from matplotlib.transforms import TransformNode
+from lib.line_ops import Line
+from lib.vec_ops import TransTip, TransVector
+from lib.types import PNTS, BEZS
+import numpy as np
+
+
+@dataclass
+class AnimatedObjectParams:
+    color: str = "#58C4DD"
+    width: int = 1
+    dur: float = 10
 
 # This class handles svg a.k.a xml data using minidom
 class Document:
@@ -39,11 +52,23 @@ class Document:
         self.svg.setAttribute("viewBox", f"{-width / 2} {-height / 2} {width} {height + text_frame}")
         self.root.appendChild(self.svg)
 
+        # Converts the grid into an cartesian cordinate system
         self.grid = self.root.createElement("g")
         self.grid.setAttribute("transform", "scale(1,-1)")
         self.svg.appendChild(self.grid)
 
         self.text_offset = int(height / 2)
+
+    # Creates a background for the entire canvas
+    def set_background(self, color: str) -> None:
+        background = self.root.createElement("rect")
+        background.setAttribute("x", "-50%")
+        background.setAttribute("y", "-50%")
+        background.setAttribute("width", "100%")
+        background.setAttribute("height", "100%")
+        background.setAttribute("fill", color)
+        self.svg.insertBefore(background, self.grid)
+
 
     # Creates a minidom.Element svg of the provided latex inline math equation
     @staticmethod
@@ -99,57 +124,57 @@ class Document:
         self.svg.appendChild(x_label)
         self.svg.appendChild(y_label)
 
-    # Creates a background for the entire canvas
-    def set_background(self, color: str) -> None:
-        background = self.root.createElement("rect")
-        background.setAttribute("x", "-50%")
-        background.setAttribute("y", "-50%")
-        background.setAttribute("width", "100%")
-        background.setAttribute("height", "100%")
-        background.setAttribute("fill", color)
-        self.svg.insertBefore(background, self.grid)
+    # Takes a sequence of cubic Bezier segments and returns an SVG path string
+    # for the d-attribute of a path element.
+    @staticmethod
+    def construct_bezier_string(bezier: BEZS) -> str:
+        r = lambda x: str(np.round(x.item(), 2))
+        bezier_str = f"M {r(bezier[0][0][0])} {r(bezier[0][0][1])} "
 
-    # Creates an animated vector tip from the triangle vertecies string
-    def construct_animated_tip(
-        self, triangle_init: str, triangle_end: str, color: str, dur: float = 2) -> minidom.Element:
-        path = self.root.createElement("polygon")
-        path.setAttribute("stroke", "none")
-        path.setAttribute("fill", color)
+        for i in range(len(bezier)):
+            pack = bezier[i]
+            bez = "C "
 
-        animate = self.root.createElement("animate")
-        animate.setAttribute("from", triangle_init)
-        animate.setAttribute("to", triangle_end)
-        animate.setAttribute("dur", f"{dur}s")
-        animate.setAttribute("attributeName", "points")
-        animate.setAttribute("fill", "freeze")
+            for k in range(1, 4):
+                bez += r(pack[k][0]) + " " + r(pack[k][1])
 
-        path.appendChild(animate)
+                if k < 3:
+                    bez += ", "
+                else:
+                    bez += " "
 
-        return path
+            bezier_str += bez
 
-    # Creates an animated vector from the path string and the vector tips vectecies string
-    def create_animated_vector(
-        self, line_init: str, line_end: str, triangle_init: str, triangle_end: str,
-        color: str, width: int = 1, dur: float = 2) -> None:
-        vec = self.root.createElement("g")
-        lin = self.construct_animated_path(line_init, line_end, color=color, width=width, dur=dur)
-        tip = self.construct_animated_tip(triangle_init, triangle_end, color, dur=dur)
-        vec.appendChild(lin)
-        vec.appendChild(tip)
-        self.grid.appendChild(vec)
+        return bezier_str
+
+    # Converts the vertecies of a tip of a vector to a svg readable string
+    @staticmethod
+    def vertecies_to_string(vertecies: PNTS) -> str:
+        out = ""
+        r = lambda v: str(np.round(v, 2))
+
+        for i, vertex in enumerate(vertecies):
+            x, y = vertex
+            out += f"{r(x)},{r(y)}"
+
+            out += " " if i < len(vertecies) else ""
+
+        return out
 
     # Constructs and returns an animated path from the provided svg d-path start to the end
-    def construct_animated_path(
-        self, init: str, end: str, color: str = "#58C4DD", width: int = 1, dur: float = 2) -> minidom.Element:
+    def _construct_animated_path(self, line: Line, args: AnimatedObjectParams) -> minidom.Element:
         path = self.root.createElement("path")
-        path.setAttribute("stroke", color)
-        path.setAttribute("stroke-width", str(width))
+        path.setAttribute("stroke", args.color)
+        path.setAttribute("stroke-width", str(args.width))
         path.setAttribute("fill", "none")
 
+        line_bez = line.get_bezier()
+        trans_line_bez = line.get_transform_bez()
+
         animate = self.root.createElement("animate")
-        animate.setAttribute("from", init)
-        animate.setAttribute("to", end)
-        animate.setAttribute("dur", f"{dur}s")
+        animate.setAttribute("from", self.construct_bezier_string(line_bez))
+        animate.setAttribute("to", self.construct_bezier_string(trans_line_bez))
+        animate.setAttribute("dur", f"{args.dur}s")
         animate.setAttribute("attributeName", "d")
         animate.setAttribute("fill", "freeze")
 
@@ -157,10 +182,42 @@ class Document:
 
         return path
 
+    # Creates an animated vector tip from the triangle vertecies string
+    def _construct_animated_tip(self, tip: TransTip, args: AnimatedObjectParams) -> minidom.Element:
+        polygon = self.root.createElement("polygon")
+        polygon.setAttribute("stroke", "none")
+        polygon.setAttribute("fill", args.color)
+
+        animate = self.root.createElement("animate")
+
+        tip_vertecies = tip.get_tip() 
+        trans_tip_vertecies = tip.get_trans_tip() 
+
+        animate.setAttribute("from", self.vertecies_to_string(tip_vertecies))
+        animate.setAttribute("to", self.vertecies_to_string(trans_tip_vertecies))
+        animate.setAttribute("dur", f"{args.dur}s")
+        animate.setAttribute("attributeName", "points")
+        animate.setAttribute("fill", "freeze")
+
+        polygon.appendChild(animate)
+
+        return polygon
+
+    # Creates an animated vector from the path string and the vector tips vectecies string
+    def create_animated_vector(self, vector: TransVector, args: AnimatedObjectParams) -> None:
+        vec = self.root.createElement("g")
+        v_line, v_tip = vector.get_components()
+
+        lin = self._construct_animated_path(v_line, args)
+        tip = self._construct_animated_tip(v_tip, args)
+
+        vec.appendChild(lin)
+        vec.appendChild(tip)
+        self.grid.appendChild(vec)
+
     # Creates an animated path from the provided svg d-path start to the end
-    def create_animated_path(
-        self, init: str, end: str, color: str = "#58C4DD", width: int = 1, dur: float = 2) -> None:
-        path = self.construct_animated_path(init, end, color=color, width=width, dur=dur)
+    def create_animated_line(self, line: Line, args: AnimatedObjectParams) -> None:
+        path = self._construct_animated_path(line, args)
         self.grid.appendChild(path)
 
     # Returns the svg content as a string
