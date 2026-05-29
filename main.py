@@ -1,7 +1,7 @@
 import numpy as np
 
-from lib.grid_ops import Grid
-from lib.svg import AnimatedObjectParams, Document
+from lib.grid import Grid
+from lib.document import AnimatedObjectParams, Document
 
 
 R = 400

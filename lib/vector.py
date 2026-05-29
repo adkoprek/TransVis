@@ -15,8 +15,8 @@ import numpy as np
 from copy import copy
 from typing import Callable
 
-from lib.line_ops import TransLine
-from lib.line_ops import BEZS, PNTS
+from lib.line import TransLine
+from lib.types import BEZS, PNTS
 
 
 class TransTip:

@@ -14,9 +14,9 @@
 
 from typing import Callable
 
-import lib.svg as svg
-from lib.line_ops import TransLine
-from lib.vec_ops import TransVector
+import lib.document as svg
+from lib.line import TransLine
+from lib.vector import TransVector
 
 
 class Grid:

@@ -14,6 +14,7 @@
 
 import numpy as np
 from typing import Callable
+
 from lib.types import PNT, PNTS, BEZ, BEZS
 
 

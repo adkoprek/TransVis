@@ -19,8 +19,8 @@ from dataclasses import dataclass
 from xml.dom import minidom, Node
 
 from lib.types import PNTS, BEZS
-from lib.line_ops import TransLine
-from lib.vec_ops import TransTip, TransVector
+from lib.line import TransLine
+from lib.vector import TransTip, TransVector
 
 
 @dataclass
