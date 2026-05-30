@@ -21,5 +21,5 @@ grid.transform(
 )
 grid.normalize(int(1 * R))
 grid.paint(doc, dur=10)
-doc.save("svg.html")
+doc.save("svg.svg")
 
