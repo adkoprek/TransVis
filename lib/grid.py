@@ -19,6 +19,9 @@ from lib.line import TransLine
 from lib.vector import TransVector
 
 
+# 2D Cartesian grid container: stores transformable grid lines and
+# optional direction vectors; provides helpers to populate, transform,
+# normalize and paint the grid into a `Document`.
 class Grid:
     def __init__(self) -> None:
         self.line: list[TransLine] = []

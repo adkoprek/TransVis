@@ -147,15 +147,15 @@ class Document:
 
     # Converts the vertices of a vector tip to an SVG-readable string
     @staticmethod
-    def vertecies_to_string(vertecies: PNTS) -> str:
+    def vertices_to_string(vertices: PNTS) -> str:
         out = ""
         r = lambda v: str(np.round(v, 2))
 
-        for i, vertex in enumerate(vertecies):
+        for i, vertex in enumerate(vertices):
             x, y = vertex
             out += f"{r(x)},{r(y)}"
 
-            out += " " if i < len(vertecies) else ""
+            out += " " if i < len(vertices) - 1 else ""
 
         return out
 
@@ -188,11 +188,11 @@ class Document:
 
         animate = self.root.createElement("animate")
 
-        tip_vertecies = tip.get_tip() 
-        trans_tip_vertecies = tip.get_trans_tip() 
+        tip_vertices = tip.get_tip()
+        trans_tip_vertices = tip.get_trans_tip()
 
-        animate.setAttribute("from", self.vertecies_to_string(tip_vertecies))
-        animate.setAttribute("to", self.vertecies_to_string(trans_tip_vertecies))
+        animate.setAttribute("from", self.vertices_to_string(tip_vertices))
+        animate.setAttribute("to", self.vertices_to_string(trans_tip_vertices))
         animate.setAttribute("dur", f"{args.dur}s")
         animate.setAttribute("attributeName", "points")
         animate.setAttribute("fill", "freeze")

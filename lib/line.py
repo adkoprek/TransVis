@@ -24,6 +24,8 @@ CONVERTER_MATRIX = (1 / 6) * np.array([[ 0, 6, 0,  0],
                                        [ 0, 1, 6, -1],
                                        [ 0, 0, 6,  0]], dtype=np.float64)
 
+# Transformable polyline: holds original and transformed points and
+# provides conversion to cubic Bezier segments used for rendering.
 class TransLine:
     # Creates a line with a specified number of points
     # from the specified coordinates. Additionally, it

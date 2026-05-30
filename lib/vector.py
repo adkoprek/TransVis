@@ -19,6 +19,8 @@ from lib.line import TransLine
 from lib.types import BEZS, PNTS
 
 
+# Arrow tip geometry computed from the end of a Bezier curve.
+# Calculates initial and transformed tip vertices for rendering.
 class TransTip:
     side: int
 
@@ -26,28 +28,28 @@ class TransTip:
     # perpendicular to the end of the provided line
     def __init__(self, line: TransLine, side: int) -> None:
         self.side = side
-        self.vertecies = self._tip_vertecies_from_beizer(line.get_bezier(), self.side)
-        self.trans_vertecies = np.array([])
+        self.vertices = self._tip_vertices_from_bezier(line.get_bezier(), self.side)
+        self.trans_vertices = np.array([])
 
     # Calculates the transformed vertices using the side length passed in the
     # constructor, perpendicular to the end of the provided transformed line
     def transform(self, line: TransLine) -> None:
-        self.trans_vertecies = self._tip_vertecies_from_beizer(line.get_transform_bez(), self.side)
+        self.trans_vertices = self._tip_vertices_from_bezier(line.get_transform_bez(), self.side)
 
     # Returns the initial tip
     def get_tip(self) -> PNTS:
-        return self.vertecies
+        return self.vertices
 
     # Returns the transformed tip
     def get_trans_tip(self) -> PNTS:
-        return self.trans_vertecies
+        return self.trans_vertices
 
     # This function takes the coefficients of a Bezier curve and
     # creates the vertices of an arrow tip that sits on the tangent
     # of the last two control points with side length l, and reduces
     # the length of the line by l.
     @staticmethod
-    def _tip_vertecies_from_beizer(bezier: BEZS, l: int) -> PNTS:
+    def _tip_vertices_from_bezier(bezier: BEZS, l: int) -> PNTS:
         _, _, p3, p4 = copy(bezier[0])
 
         h = ((3 ** 0.5) * l) / 2
@@ -67,6 +69,9 @@ class TransTip:
         return np.array([v1, v2, v3])
 
 
+# Simple vector composed of a `TransLine` and `TransTip`.
+# Can be transformed and scaled; `get_components` returns the
+# underlying line and tip for rendering.
 class TransVector:
     line: TransLine
     tip: TransTip
