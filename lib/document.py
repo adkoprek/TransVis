@@ -70,10 +70,12 @@ class Document:
 
 
     # Creates a minidom.Element SVG from the provided LaTeX inline math equation
+    # it returns a group containing the math block and the dimensions of the equation
     @staticmethod
-    def latex_to_svg(latex, size: int = 24, color: str = "white") -> minidom.Element:
+    def latex_to_svg(latex, size: int = 24, color: str = "white") -> tuple[minidom.Element, tuple[float, float]]:
         fig = plt.figure()
         text = fig.text(0, 0, latex, color=color, fontsize=size)
+        plt.axis("off")
 
         # Resize `````````````````````````````````````````````````````````````````````````
         fig.canvas.draw()
@@ -83,10 +85,7 @@ class Document:
         height = bbox.height / dpi
         fig.set_size_inches(width, height)
 
-        plt.axis("off")
-
         buffer = io.StringIO()
-
         fig.savefig(
             buffer,
             format="svg",
@@ -96,28 +95,31 @@ class Document:
         )
 
         svg_text = buffer.getvalue()
-        svg_root = minidom.parseString(svg_text)
+        mat_svg = minidom.parseString(svg_text)
+        svg_root = mat_svg.getElementsByTagName("svg")[0]
+
+        svg_width = float(svg_root.getAttribute("width").replace("pt", ""))
+        svg_height = float(svg_root.getAttribute("height").replace("pt", ""))
 
         svg = minidom.Document()
         group = svg.createElement("g")
-        
-        for node in svg_root.documentElement.childNodes:
+
+        for node in mat_svg.documentElement.childNodes:
             if node.nodeType == Node.ELEMENT_NODE:
                 if node.tagName in ["g", "defs"]:
                     group.appendChild(node)
 
         svg.appendChild(group)
 
-        return group
-
+        return (group, (svg_width, svg_height))
 
     # Adds function descriptions to the bottom of the animation using
     # the provided LaTeX code and padding.
     def add_functions(self, latex_x: str, latex_y: str, padding: int, color: str = "white", size: int = 24):
-        x_label = self.latex_to_svg(latex_x, color=color, size=size)
-        x_label.setAttribute("transform", f"translate(-215, {self.text_offset + padding})")
-        y_label = self.latex_to_svg(latex_y, color=color, size=size)
-        y_label.setAttribute("transform", f"translate(-215, {self.text_offset + padding + 57})")
+        x_label, x_dim = self.latex_to_svg(latex_x, color=color, size=size)
+        x_label.setAttribute("transform", f"translate({-x_dim[0] / 2}, {self.text_offset + padding})")
+        y_label, y_dim = self.latex_to_svg(latex_y, color=color, size=size)
+        y_label.setAttribute("transform", f"translate({-y_dim[0] / 2}, {self.text_offset + padding + x_dim[1]})")
 
         self.svg.appendChild(x_label)
         self.svg.appendChild(y_label)

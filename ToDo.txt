@@ -1,5 +1,0 @@
-1. Functions rendering +
-2. README
-3. Clean up
-  - Fix scaled direction vectors not following the curve
-5. Check against requirements
