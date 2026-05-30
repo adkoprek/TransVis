@@ -32,7 +32,7 @@ class Grid:
     
     # Creates an initial Cartesian grid from the specified
     # x and y points
-    def init_grid(self, x_min, x_max, y_min, y_max, num) -> None:
+    def init_grid(self, x_min: int, x_max: int, y_min: int, y_max: int, num: int) -> None:
         dx = int((x_max - x_min) / num)
         for i in range(x_min, x_max + dx, dx):
             self.line.append(TransLine(x_min, x_max, i, i, dx))
@@ -61,7 +61,7 @@ class Grid:
 
     # Normalizes the grid to a specified width r for improved rendering
     # of stretching or squishing functions
-    def normalize(self, r: int) -> None:
+    def normalize(self, r: float) -> None:
         m = 0
         for line in self.line:
             m = max(line.trans_max(), m)

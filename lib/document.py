@@ -121,7 +121,7 @@ class Document:
 
     # Adds function descriptions to the bottom of the animation using
     # the provided LaTeX code and padding.
-    def add_functions(self, latex_x: str, latex_y: str, padding: int, color: str = "white", size: int = 24):
+    def add_functions(self, latex_x: str, latex_y: str, padding: int = 10, color: str = "white", size: int = 24):
         position = self.height / 2
 
         x_label, x_dim = self.latex_to_svg(latex_x, color=color, size=size)
