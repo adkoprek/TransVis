@@ -26,9 +26,9 @@
   <p align="center">
     A simple 2D transformation svg animation
     <br />
-    <a href="https://github.com/adkoprek/LinAlg/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    <a href="https://github.com/adkoprek/TransVis/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     ·
-    <a href="https://github.com/adkoprek/LinAlg/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+    <a href="https://github.com/adkoprek/TransVis/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 </div>
 
@@ -36,7 +36,7 @@
 ## About The Project
 
 <p align="center">
-  <img src="svg.svg" alt="Screenshot"/>
+  <img src="example.svg" alt="Screenshot"/>
 </p>
 
 This project contains a library for handling 2D grid transformation and converting them into svg animations. It supports any 2D transformation, scaling, direction vectors and equation rendering. 

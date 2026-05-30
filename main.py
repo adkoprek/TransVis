@@ -30,5 +30,5 @@ grid.transform(
 grid.normalize(int(0.95 * R))
 grid.paint(doc)
 grid.paint_directions(doc, AnimatedObjectParams(color="#CF5044",width=3), AnimatedObjectParams(color="#699C52", width=3))
-doc.save("svg.svg")
+doc.save("example.svg")
 

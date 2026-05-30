@@ -45,6 +45,7 @@ class Document:
     def init_document(self, width: int, height: int, text_frame: int = 0) -> None:
         self.svg = self.root.createElement("svg")
         self.svg.setAttribute("xmlns", "http://www.w3.org/2000/svg")
+        self.svg.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink")
         self.svg.setAttribute("version", "1.1")
         self.svg.setAttribute("width", f"{width}px")
         self.svg.setAttribute("height", f"{height + text_frame}px")
