@@ -6,8 +6,7 @@
 #    |_|_|  \__,_|_| |_|___/ \/   |_|___/
 #   https://git.psi.ch/hipa_apps/TransVis
 #
-# Defines custom types which are used across
-# the project.
+# Defines custom types used across the project.
 #
 # @Author: Adam Koprek
 
@@ -22,9 +21,9 @@ PNT:  TypeAlias = npt.NDArray[np.float64]    # (2,)
 # A 2D set of points
 PNTS: TypeAlias = npt.NDArray[np.float64]    # (M,2)
 
-# A single cubic bezier segment
+# A single cubic Bezier segment
 BEZ:  TypeAlias = npt.NDArray[np.float64]    # (4,2)
 
-# A set of cubic bezier segments
+# A set of cubic Bezier segments
 BEZS: TypeAlias = npt.NDArray[np.float64]    # (M,4,2)
 

@@ -29,7 +29,7 @@ class AnimatedObjectParams:
     width: int = 1
     dur: float = 10
 
-# This class handles svg a.k.a xml data using minidom
+# This class handles SVG (XML) data using minidom
 class Document:
     root: minidom.Document
     svg: minidom.Element
@@ -40,8 +40,8 @@ class Document:
     def __init__(self) -> None:
         self.root = minidom.Document()
     
-    # Initializes an empty xml document and grid which is flipped to
-    # be maathematically aligned correctly 
+    # Initializes an empty XML document and a grid which is flipped to
+    # be mathematically aligned correctly
     def init_document(self, width: int, height: int, text_frame: int = 0) -> None:
         self.svg = self.root.createElement("svg")
         self.svg.setAttribute("xmlns", "http://www.w3.org/2000/svg")
@@ -51,7 +51,7 @@ class Document:
         self.svg.setAttribute("viewBox", f"{-width / 2} {-height / 2} {width} {height + text_frame}")
         self.root.appendChild(self.svg)
 
-        # Converts the grid into an cartesian cordinate system
+        # Converts the grid into a Cartesian coordinate system
         self.grid = self.root.createElement("g")
         self.grid.setAttribute("transform", "scale(1,-1)")
         self.svg.appendChild(self.grid)
@@ -69,7 +69,7 @@ class Document:
         self.svg.insertBefore(background, self.grid)
 
 
-    # Creates a minidom.Element svg of the provided latex inline math equation
+    # Creates a minidom.Element SVG from the provided LaTeX inline math equation
     @staticmethod
     def latex_to_svg(latex, size: int = 24, color: str = "white") -> minidom.Element:
         fig = plt.figure()
@@ -111,9 +111,8 @@ class Document:
         return group
 
 
-    # Add function descriptions to the bottom of the animation using
-    # the provide latex code and the provided padding to the bottom
-    # of the animation
+    # Adds function descriptions to the bottom of the animation using
+    # the provided LaTeX code and padding.
     def add_functions(self, latex_x: str, latex_y: str, padding: int, color: str = "white", size: int = 24):
         x_label = self.latex_to_svg(latex_x, color=color, size=size)
         x_label.setAttribute("transform", f"translate(-215, {self.text_offset + padding})")
@@ -146,7 +145,7 @@ class Document:
 
         return bezier_str
 
-    # Converts the vertecies of a tip of a vector to a svg readable string
+    # Converts the vertices of a vector tip to an SVG-readable string
     @staticmethod
     def vertecies_to_string(vertecies: PNTS) -> str:
         out = ""
@@ -160,7 +159,7 @@ class Document:
 
         return out
 
-    # Constructs and returns an animated path from the provided svg d-path start to the end
+    # Constructs and returns an animated path from the provided SVG d-path (start to end)
     def _construct_animated_path(self, line: TransLine, args: AnimatedObjectParams) -> minidom.Element:
         path = self.root.createElement("path")
         path.setAttribute("stroke", args.color)
@@ -181,7 +180,7 @@ class Document:
 
         return path
 
-    # Creates an animated vector tip from the triangle vertecies string
+    # Creates an animated vector tip from the triangle vertices
     def _construct_animated_tip(self, tip: TransTip, args: AnimatedObjectParams) -> minidom.Element:
         polygon = self.root.createElement("polygon")
         polygon.setAttribute("stroke", "none")
@@ -202,7 +201,7 @@ class Document:
 
         return polygon
 
-    # Creates an animated vector from the path string and the vector tips vectecies string
+    # Creates an animated vector from the path and the vector tip's vertices
     def create_animated_vector(self, vector: TransVector, args: AnimatedObjectParams) -> None:
         vec = self.root.createElement("g")
         v_line, v_tip = vector.get_components()
@@ -214,16 +213,16 @@ class Document:
         vec.appendChild(tip)
         self.grid.appendChild(vec)
 
-    # Creates an animated path from the provided svg d-path start to the end
+    # Creates an animated path from the provided SVG d-path (start to end)
     def create_animated_line(self, line: TransLine, args: AnimatedObjectParams) -> None:
         path = self._construct_animated_path(line, args)
         self.grid.appendChild(path)
 
-    # Returns the svg content as a string
+    # Returns the SVG content as a string
     def get_str(self) -> str:
         return self.root.documentElement.toprettyxml(indent="\t")
 
-    # Saves the svg to a file
+    # Saves the SVG to a file
     def save(self, path: str) -> None:
         with open(path, "w+") as file:
             file.write(self.get_str())

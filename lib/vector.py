@@ -6,7 +6,7 @@
 #    |_|_|  \__,_|_| |_|___/ \/   |_|___/
 #   https://git.psi.ch/hipa_apps/TransVis
 #
-# Implements a transformable vector which 
+# Implements a transformable vector which
 # automatically calculates its vector tip.
 #
 # @Author: Adam Koprek
@@ -22,15 +22,15 @@ from lib.types import BEZS, PNTS
 class TransTip:
     side: int
 
-    # Creates the tip and calculates the initial tip with the given side lenght
+    # Creates the tip and calculates the initial tip with the given side length
     # perpendicular to the end of the provided line
     def __init__(self, line: TransLine, side: int) -> None:
         self.side = side
         self.vertecies = self._tip_vertecies_from_beizer(line.get_bezier(), self.side)
         self.trans_vertecies = np.array([])
 
-    # Calculates the transformed vectercies using the side lenght passed in the
-    # constuctor perpendicular to the end of the provided transfomed line
+    # Calculates the transformed vertices using the side length passed in the
+    # constructor, perpendicular to the end of the provided transformed line
     def transform(self, line: TransLine) -> None:
         self.trans_vertecies = self._tip_vertecies_from_beizer(line.get_transform_bez(), self.side)
 
@@ -42,10 +42,10 @@ class TransTip:
     def get_trans_tip(self) -> PNTS:
         return self.trans_vertecies
 
-    # This function takes the coefficient of a bezier curve and
-    # creates the vertecies of an arrow tip sits on the tangent 
-    # of the last two control points with side length l and reduces
-    # the length of the line by l
+    # This function takes the coefficients of a Bezier curve and
+    # creates the vertices of an arrow tip that sits on the tangent
+    # of the last two control points with side length l, and reduces
+    # the length of the line by l.
     @staticmethod
     def _tip_vertecies_from_beizer(bezier: BEZS, l: int) -> PNTS:
         _, _, p3, p4 = copy(bezier[0])
@@ -71,7 +71,7 @@ class TransVector:
     line: TransLine
     tip: TransTip
 
-    # Creates the vector which is build from a line and a tip
+    # Creates the vector which is built from a line and a tip
     def __init__(self, begin_x: float, end_x: float, begin_y: float, end_y: float, w: int) -> None:
         self.line = TransLine(begin_x, end_x, begin_y, end_y, 1)
         self.tip = TransTip(self.line, w)
@@ -81,7 +81,7 @@ class TransVector:
         self.line.transform(xt, yt)
         self.tip.transform(self.line)
 
-    # Scales the entire vector 
+    # Scales the entire vector
     def scale(self, s: float) -> None:
         self.line.scale_transformed(s)
         self.tip.transform(self.line)

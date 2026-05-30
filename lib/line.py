@@ -6,9 +6,9 @@
 #    |_|_|  \__,_|_| |_|___/ \/   |_|___/
 #   https://git.psi.ch/hipa_apps/TransVis
 #
-# Implements a transoformable line which
-# using catmull-ron interpolation can be
-# converted into a chain of bezier curves.
+# Implements a transformable line which,
+# using Catmull-Rom interpolation, can be
+# converted into a chain of Bezier curves.
 #
 # @Author: Adam Koprek
 
@@ -25,10 +25,9 @@ CONVERTER_MATRIX = (1 / 6) * np.array([[ 0, 6, 0,  0],
                                        [ 0, 0, 6,  0]], dtype=np.float64)
 
 class TransLine:
-    # Creates a line with a specified amount of points 
-    # from the specified cordinates. Additionally it
-    # creates an extra point at both ends for later
-    # interpolation
+    # Creates a line with a specified number of points
+    # from the specified coordinates. Additionally, it
+    # creates an extra point at both ends for interpolation.
     def __init__(self, begin_x, end_x, begin_y, end_y, steps) -> None:
         self._points: PNTS = np.array([])
         self._trans_points: PNTS = np.array([])
@@ -57,7 +56,7 @@ class TransLine:
         return np.column_stack((bez_x.ravel(), bez_y.ravel()))
 
     # This function takes a sequence of 2D points and returns a sequence of cubic
-    # Bezier segments constructed from overlapping groups of 4 points.
+    # Bezier segments constructed from overlapping groups of four points.
     def _line_to_bezier(self, line: PNTS) -> BEZS:
         bezier = []
         for i in range(1, len(line) - 2):
@@ -78,7 +77,7 @@ class TransLine:
     def get_transform_bez(self) -> BEZS:
         return self._line_to_bezier(self._trans_points)
 
-    # Applies a coordinate-wise transformation to a set of 2D points
+    # Applies a coordinate-wise transformation to a set of 2D points.
     def transform(self, xt: Callable[[float, float], float], yt: Callable[[float, float], float]) -> None:
         transfomed = []
         for point in self._points:
